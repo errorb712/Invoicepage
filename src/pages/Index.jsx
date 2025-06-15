@@ -54,7 +54,7 @@ const noteOptions = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const [selectedCurrency, setSelectedCurrency] = useState("INR");
+  const [selectedCurrency, setSelectedCurrency] = useState("MYR");
   const [billTo, setBillTo] = useState({ name: "", address: "", phone: "" });
   const [shipTo, setShipTo] = useState({ name: "", address: "", phone: "" });
   const [invoice, setInvoice] = useState({
@@ -95,7 +95,7 @@ const Index = () => {
       setItems(parsedData.items || []);
       settaxPercentage(parsedData.taxPercentage || 0);
       setNotes(parsedData.notes || "");
-      setSelectedCurrency(parsedData.selectedCurrency || "INR"); // Load selectedCurrency from localStorage
+      setSelectedCurrency(parsedData.selectedCurrency || "MYR"); // Load selectedCurrency from localStorage
     } else {
       // If no saved data, set invoice number
       setInvoice((prev) => ({
@@ -221,14 +221,14 @@ const Index = () => {
 
   const fillDummyData = () => {
     setBillTo({
-      name: "John Doe",
-      address: "123 Main St, Anytown, USA",
-      phone: "(555) 123-4567",
+      name: "ABC Marketing Sdn Bhd",
+      address: "No. 123, Jalan Damansara, 60000 Kuala Lumpur, Malaysia",
+      phone: "+60 3-1234 5678",
     });
     setShipTo({
-      name: "Jane Smith",
-      address: "456 Elm St, Othertown, USA",
-      phone: "(555) 987-6543",
+      name: "ABC Marketing Sdn Bhd",
+      address: "No. 123, Jalan Damansara, 60000 Kuala Lumpur, Malaysia", 
+      phone: "+60 3-1234 5678",
     });
     setInvoice({
       date: new Date().toISOString().split("T")[0],
@@ -238,57 +238,43 @@ const Index = () => {
       number: generateRandomInvoiceNumber(),
     });
     setYourCompany({
-      name: "Your Company",
-      address: "789 Oak St, Businessville, USA",
-      phone: "(555) 555-5555",
+      name: "Creative Design Studio",
+      address: "Suite 10-2, Level 10, Menara ABC, Jalan Sultan Ismail, 50250 Kuala Lumpur",
+      phone: "+60 12-345 6789",
     });
     setItems([
       {
-        name: "Product A",
-        description: "High-quality item",
-        quantity: 2,
-        amount: 50,
-        total: 100,
-      },
-      {
-        name: "Service B",
-        description: "Professional service",
+        name: "Logo Design",
+        description: "Complete brand identity design including logo variations",
         quantity: 1,
-        amount: 200,
-        total: 200,
+        amount: 2500,
+        total: 2500,
       },
       {
-        name: "Product C",
-        description: "Another great product",
-        quantity: 3,
-        amount: 30,
-        total: 90,
-      },
-      {
-        name: "Service D",
-        description: "Another professional service",
-        quantity: 2,
+        name: "Website Development",
+        description: "Responsive website with CMS integration",
+        quantity: 80,
         amount: 150,
+        total: 12000,
+      },
+      {
+        name: "Brand Guidelines",
+        description: "Comprehensive brand style guide document",
+        quantity: 1,
+        amount: 1500,
+        total: 1500,
+      },
+      {
+        name: "Business Card Design",
+        description: "Double-sided business card design with print-ready files",
+        quantity: 1,
+        amount: 300,
         total: 300,
       },
-      {
-        name: "Product E",
-        description: "Yet another product",
-        quantity: 1,
-        amount: 75,
-        total: 75,
-      },
-      {
-        name: "Service F",
-        description: "Yet another service",
-        quantity: 4,
-        amount: 100,
-        total: 400,
-      },
     ]);
-    settaxPercentage(10);
+    settaxPercentage(6); // Malaysia SST
     calculateSubTotal();
-    setNotes("Thank you for your business!");
+    setNotes("Thank you for choosing our design services! Payment terms: Net 30 days.");
   };
 
   const clearForm = () => {
@@ -308,7 +294,7 @@ const Index = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 relative">
-      <h1 className="text-3xl font-bold mb-8 text-center">Bill Generator</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Invoice Generator for Services</h1>
       <div className="fixed top-4 left-4 flex gap-2">
         <button
           onClick={clearForm}
@@ -320,7 +306,7 @@ const Index = () => {
         <button
           onClick={fillDummyData}
           className="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-600"
-          aria-label="Fill with Dummy Data"
+          aria-label="Fill with Sample Data"
         >
           <FiEdit size={24} />
         </button>
@@ -384,7 +370,7 @@ const Index = () => {
                 />
                 <FloatingLabelInput
                   id="paymentDate"
-                  label="Payment Date"
+                  label="Due Date"
                   type="date"
                   value={invoice.paymentDate}
                   onChange={handleInputChange(setInvoice)}
@@ -394,14 +380,15 @@ const Index = () => {
             </div>
 
             <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-4">Your Company</h2>
+              <h2 className="text-2xl font-semibold mb-4">Service Provider</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FloatingLabelInput
                   id="yourCompanyName"
-                  label="Name"
+                  label="Business Name"
                   value={yourCompany.name}
                   onChange={handleInputChange(setYourCompany)}
                   name="name"
+                  placeholder="Your business name"
                 />
                 <FloatingLabelInput
                   id="yourCompanyPhone"
@@ -409,15 +396,17 @@ const Index = () => {
                   value={yourCompany.phone}
                   onChange={handleInputChange(setYourCompany)}
                   name="phone"
+                  placeholder="Your phone number"
                 />
               </div>
               <FloatingLabelInput
                 id="yourCompanyAddress"
-                label="Address"
+                label="Business Address"
                 value={yourCompany.address}
                 onChange={handleInputChange(setYourCompany)}
                 name="address"
                 className="mt-4"
+                placeholder="Your business address"
               />
             </div>
 
@@ -445,6 +434,7 @@ const Index = () => {
                   min="0"
                   max="28"
                   step="1"
+                  placeholder="6"
                 />
               </div>
               <div className="flex justify-between mb-2">
@@ -459,7 +449,7 @@ const Index = () => {
 
             <div className="mb-6">
               <div className="flex items-center mb-2">
-                <h3 className="text-lg font-medium">Notes</h3>
+                <h3 className="text-lg font-medium">Payment Terms & Notes</h3>
                 <button
                   type="button"
                   onClick={refreshNotes}
@@ -474,6 +464,7 @@ const Index = () => {
                 onChange={(e) => setNotes(e.target.value)}
                 className="w-full p-2 border rounded"
                 rows="4"
+                placeholder="Payment terms, additional notes, or thank you message..."
               ></textarea>
             </div>
 
