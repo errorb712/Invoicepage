@@ -1,3 +1,4 @@
+
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -62,6 +63,9 @@ export const generatePDF = async (invoiceData, templateNumber) => {
           break;
         case 9:
           fileName = `IN-${date}.pdf`;
+          break;
+        case 10:
+          fileName = `Minimalist_${number}.pdf`;
           break;
         default:
           fileName = `invoice_template_${templateNumber}.pdf`;

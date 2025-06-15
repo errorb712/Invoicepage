@@ -1,3 +1,4 @@
+
 import Template1 from '../components/templates/Template1';
 import Template2 from '../components/templates/Template2';
 import Template3 from '../components/templates/Template3';
@@ -7,6 +8,7 @@ import Template6 from '../components/templates/Template6';
 import Template7 from '../components/templates/Template7';
 import Template8 from '../components/templates/Template8';
 import Template9 from '../components/templates/Template9';
+import Template10 from '../components/templates/Template10';
 
 export const templates = [
   { name: 'Template 1', component: Template1 },
@@ -18,6 +20,7 @@ export const templates = [
   { name: 'Template 7', component: Template7 },
   { name: 'Template 8', component: Template8 },
   { name: 'Template 9', component: Template9 },
+  { name: 'Minimalist', component: Template10 },
 ];
 
 export const getTemplate = (templateNumber) => {
