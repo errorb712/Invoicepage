@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from 'date-fns';
 import BaseTemplate2 from './BaseTemplate2';
@@ -15,80 +16,112 @@ const Receipt3 = ({ data, isPrint = false }) => {
     <BaseTemplate2
       width="80mm"
       height="auto"
-      className="p-2"
+      className="p-4"
       data={data}
       isPrint={isPrint}
     >
       <div
-        className="bg-white flex flex-col min-h-full"
+        className="bg-white font-inter font-bold"
         style={{
-          fontSize: isPrint ? "8px" : "14px",
-          fontFamily: "'Monaco', monospace",
-          whiteSpace: "pre-wrap",
-          lineHeight: "1.2",
+          fontSize: isPrint ? "10px" : "12px",
+          lineHeight: "1.4",
         }}
       >
-        <div className="flex-grow">
-          <div className="text-center font-bold mb-2 pb-2 border-b-2 border-dashed">
-            CASH RECEIPT
-            {yourCompany.name && <div className="mt-2">{yourCompany.name}</div>}
-            {yourCompany.address && <div>{yourCompany.address}</div>}
-            {yourCompany.phone && <div>{yourCompany.phone}</div>}
+        {/* Header */}
+        <div className="text-center mb-4 pb-3 border-b-2 border-dashed border-gray-400">
+          <h1 className="text-2xl font-black mb-2">CASH RECEIPT</h1>
+          <div className="text-sm font-semibold">
+            <div className="font-bold text-base">{yourCompany.name || "Your Company Name"}</div>
+            <div className="text-xs font-medium mt-1">{yourCompany.address || "123 Your Street"}</div>
+            {yourCompany.phone && <div className="text-xs font-medium">{yourCompany.phone}</div>}
           </div>
-          <div className="mb-2 text-right">
-            <div><strong>Invoice#:</strong> {invoice.number || "N/A"}</div>
-            <div>
-              <strong>Date:</strong>{" "}
+        </div>
+
+        {/* Invoice Info */}
+        <div className="mb-4 text-sm">
+          <div className="flex justify-between mb-1">
+            <span className="font-semibold">INVOICE#:</span>
+            <span className="font-bold">{invoice.number || "00001"}</span>
+          </div>
+          <div className="flex justify-between mb-1">
+            <span className="font-semibold">DATE:</span>
+            <span className="font-bold">
               {invoice.date
                 ? format(new Date(invoice.date), "MM/dd/yyyy")
-                : "N/A"}
-            </div>
+                : "mm/dd/yyyy"}
+            </span>
           </div>
-          <div className="mb-2"><strong>Customer:</strong> {billTo || "N/A"}</div>
-          <div className="mb-2 pb-2 border-b-2 border-dashed">
-            <strong>Cashier:</strong> {cashier || "N/A"}
+        </div>
+
+        {/* Customer Info */}
+        <div className="mb-4 pb-3 border-b-2 border-dashed border-gray-400">
+          <div className="mb-2">
+            <span className="font-semibold text-sm">CUSTOMER: </span>
+            <span className="font-bold text-sm">{billTo || "Client Name"}</span>
           </div>
-          <div className="py-2 mb-2">
-            <div className="flex justify-between font-extrabold mb-2">
-              <span>Item</span>
-              <span>Qty</span>
-              <span>Amt</span>
-              <span>Total</span>
-            </div>
-            {items.map((item, index) => (
-              <div key={index} className="mb-2">
-                <div className="flex justify-between">
-                  <span>{`${index + 1}. ${item.name || "N/A"}`}</span>
-                </div>
-                <div className="grid grid-cols-3 text-right">
-                  <span>{item.quantity || 0}</span>
-                  <span>{formatCurrency(item.amount || 0, selectedCurrency)}</span>
-                  <span>{formatCurrency((item.quantity || 0) * (item.amount || 0), selectedCurrency)}</span>
-                </div>
-              </div>
-            ))}
+          <div>
+            <span className="font-semibold text-sm">CASHIER: </span>
+            <span className="font-bold text-sm">{cashier || "N/A"}</span>
           </div>
-          <div className="flex justify-between">
-            <span>SubTotal:</span>
-            <span>{formatCurrency(subTotal, selectedCurrency)}</span>
+        </div>
+
+        {/* Items Table */}
+        <div className="mb-4">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b-2 border-black">
+                <th className="text-left py-2 font-bold">ITEM</th>
+                <th className="text-center py-2 font-bold">QTY</th>
+                <th className="text-center py-2 font-bold">AMT</th>
+                <th className="text-right py-2 font-bold">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, index) => (
+                <tr 
+                  key={index} 
+                  className={`${index % 2 === 0 ? 'bg-yellow-50' : 'bg-white'} border-b border-gray-200`}
+                >
+                  <td className="py-2 font-medium">{`${index + 1}. ${item.name || "Your item name"}`}</td>
+                  <td className="text-center py-2 font-semibold">{item.quantity || 1}</td>
+                  <td className="text-center py-2 font-semibold">{formatCurrency(item.amount || 0, selectedCurrency)}</td>
+                  <td className="text-right py-2 font-bold">{formatCurrency((item.quantity || 0) * (item.amount || 0), selectedCurrency)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Totals */}
+        <div className="border-t-2 border-black pt-3">
+          <div className="flex justify-between text-sm mb-1">
+            <span className="font-semibold">SUBTOTAL:</span>
+            <span className="font-bold">{formatCurrency(subTotal, selectedCurrency)}</span>
           </div>
           {taxPercentage > 0 && (
-            <div className="flex justify-between">
-              <span>Tax ({taxPercentage}%):</span>
-              <span>{formatCurrency(taxAmount, selectedCurrency)}</span>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="font-semibold">TAX ({taxPercentage}%):</span>
+              <span className="font-bold">{formatCurrency(taxAmount, selectedCurrency)}</span>
             </div>
           )}
-          <div className="flex justify-between font-bold mt-2 pb-2 border-t-2 pt-2 border-b-2 border-dashed">
+          <div className="flex justify-between text-lg font-black mt-2 pt-2 border-t-2 border-b-2 border-dashed border-gray-400">
             <span>{`${items.length} Items`}</span>
-            <span>Total: {formatCurrency(total, selectedCurrency)}</span>
+            <span className="text-blue-600">Total: {formatCurrency(total, selectedCurrency)}</span>
           </div>
-          {notes && (
-            <div className="mt-4">
-              <div>{notes}</div>
-            </div>
-          )}
         </div>
-        <div className="text-center mt-20 text-gray-500">{footer || ""}</div>
+
+        {/* Notes */}
+        {notes && (
+          <div className="mt-4 pt-3">
+            <div className="font-semibold text-sm mb-1">TERMS</div>
+            <div className="text-xs font-medium">{notes}</div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="text-center mt-6 text-xs font-medium text-gray-500">
+          {footer || "Thank you for your business!"}
+        </div>
       </div>
     </BaseTemplate2>
   );
