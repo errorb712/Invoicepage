@@ -12,6 +12,7 @@ import { generateGSTNumber } from "../utils/invoiceCalculations";
 import FloatingLabelInput from "../components/FloatingLabelInput";
 import ItemDetails from "../components/ItemDetails";
 import CurrencySelector from "../components/CurrencySelector";
+import ImportExportButtons from "../components/ImportExportButtons";
 
 const generateRandomInvoiceNumber = () => {
   const length = Math.floor(Math.random() * 6) + 3;
@@ -150,6 +151,18 @@ const ReceiptPage = () => {
     navigate("/");
   };
 
+  const handleImportData = (importedData) => {
+    setBillTo(importedData.billTo || "");
+    setInvoice(importedData.invoice || { date: "", number: generateRandomInvoiceNumber() });
+    setYourCompany(importedData.yourCompany || { name: "", address: "", phone: "", gst: "" });
+    setCashier(importedData.cashier || "");
+    setItems(importedData.items || [{ name: "", description: "", quantity: 0, amount: 0, total: 0 }]);
+    setTaxPercentage(importedData.taxPercentage || 0);
+    setNotes(importedData.notes || "");
+    setFooter(importedData.footer || "Thank you");
+    setSelectedCurrency(importedData.selectedCurrency || "MYR");
+  };
+
   const handleInputChange = (setter) => (e) => {
     const { name, value } = e.target;
     setter((prev) => ({ ...prev, [name]: value }));
@@ -222,6 +235,21 @@ const ReceiptPage = () => {
 
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+          <ImportExportButtons 
+            formData={{
+              billTo,
+              invoice,
+              yourCompany,
+              cashier,
+              items,
+              taxPercentage,
+              notes,
+              footer,
+              selectedCurrency,
+            }}
+            onImportData={handleImportData}
+          />
+          
           <form>
             <div className="mb-6">
               <h2 className="text-2xl font-semibold mb-4">Your Company</h2>
