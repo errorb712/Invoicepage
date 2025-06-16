@@ -5,6 +5,7 @@ import FloatingLabelInput from '../components/FloatingLabelInput';
 import BillToSection from '../components/BillToSection';
 import ShipToSection from '../components/ShipToSection';
 import ItemDetails from "../components/ItemDetails";
+import ImportExportButtons from '../components/ImportExportButtons';
 import { templates } from "../utils/templateRegistry";
 import { FiEdit, FiFileText, FiTrash2 } from "react-icons/fi"; // Added FiTrash2 icon
 import { RefreshCw } from "lucide-react";
@@ -219,6 +220,17 @@ const Index = () => {
     });
   };
 
+  const handleImportData = (importedData) => {
+    setBillTo(importedData.billTo || { name: "", address: "", phone: "" });
+    setShipTo(importedData.shipTo || { name: "", address: "", phone: "" });
+    setInvoice(importedData.invoice || { date: "", paymentDate: "", number: "" });
+    setYourCompany(importedData.yourCompany || { name: "", address: "", phone: "" });
+    setItems(importedData.items || [{ name: "", description: "", quantity: 0, amount: 0, total: 0 }]);
+    settaxPercentage(importedData.taxPercentage || 0);
+    setNotes(importedData.notes || "");
+    setSelectedCurrency(importedData.selectedCurrency || "MYR");
+  };
+
   const fillDummyData = () => {
     setBillTo({
       name: "ABC Marketing Sdn Bhd",
@@ -335,6 +347,22 @@ const Index = () => {
       </button>
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+          <ImportExportButtons 
+            formData={{
+              billTo,
+              shipTo,
+              invoice,
+              yourCompany,
+              items,
+              taxPercentage,
+              taxAmount,
+              subTotal,
+              grandTotal,
+              notes,
+              selectedCurrency
+            }}
+            onImportData={handleImportData}
+          />
           <form>
             <BillToSection
               billTo={billTo}

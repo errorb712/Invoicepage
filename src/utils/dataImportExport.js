@@ -8,44 +8,49 @@ export const exportToExcel = (formData) => {
   // Create company info sheet
   const companyData = [
     ['Field', 'Value'],
-    ['Company Name', formData.yourCompany.name || ''],
-    ['Company Address', formData.yourCompany.address || ''],
-    ['Company Phone', formData.yourCompany.phone || ''],
-    ['GST Number', formData.yourCompany.gst || ''],
-    ['Cashier', formData.cashier || ''],
-    ['Bill To', formData.billTo || ''],
-    ['Invoice Number', formData.invoice.number || ''],
-    ['Invoice Date', formData.invoice.date || ''],
-    ['Currency', formData.selectedCurrency || ''],
+    ['Business Name', formData.yourCompany?.name || ''],
+    ['Business Address', formData.yourCompany?.address || ''],
+    ['Business Phone', formData.yourCompany?.phone || ''],
+    ['Bill To Name', formData.billTo?.name || ''],
+    ['Bill To Address', formData.billTo?.address || ''],
+    ['Bill To Phone', formData.billTo?.phone || ''],
+    ['Ship To Name', formData.shipTo?.name || ''],
+    ['Ship To Address', formData.shipTo?.address || ''],
+    ['Ship To Phone', formData.shipTo?.phone || ''],
+    ['Invoice Number', formData.invoice?.number || ''],
+    ['Invoice Date', formData.invoice?.date || ''],
+    ['Due Date', formData.invoice?.paymentDate || ''],
+    ['Currency', formData.selectedCurrency || 'MYR'],
     ['Tax Percentage', formData.taxPercentage || 0],
-    ['Notes', formData.notes || ''],
-    ['Footer', formData.footer || '']
+    ['Notes', formData.notes || '']
   ];
   
   const companySheet = XLSX.utils.aoa_to_sheet(companyData);
-  XLSX.utils.book_append_sheet(workbook, companySheet, 'Company Info');
+  XLSX.utils.book_append_sheet(workbook, companySheet, 'Invoice Info');
   
   // Create items sheet
   const itemsData = [
     ['Item Name', 'Description', 'Quantity', 'Amount', 'Total']
   ];
   
-  formData.items.forEach(item => {
-    itemsData.push([
-      item.name || '',
-      item.description || '',
-      item.quantity || 0,
-      item.amount || 0,
-      item.total || 0
-    ]);
-  });
+  if (formData.items && formData.items.length > 0) {
+    formData.items.forEach(item => {
+      itemsData.push([
+        item.name || '',
+        item.description || '',
+        item.quantity || 0,
+        item.amount || 0,
+        item.total || 0
+      ]);
+    });
+  }
   
   const itemsSheet = XLSX.utils.aoa_to_sheet(itemsData);
   XLSX.utils.book_append_sheet(workbook, itemsSheet, 'Items');
   
   // Generate filename with timestamp
   const timestamp = new Date().getTime();
-  const fileName = `receipt_data_${timestamp}.xlsx`;
+  const fileName = `invoice_data_${timestamp}.xlsx`;
   
   // Save the file
   XLSX.writeFile(workbook, fileName);
@@ -60,32 +65,39 @@ export const importFromExcel = (file) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         
-        // Read company info
-        const companySheet = workbook.Sheets['Company Info'];
-        const companyData = XLSX.utils.sheet_to_json(companySheet, { header: 1 });
+        // Read invoice info
+        const invoiceSheet = workbook.Sheets['Invoice Info'];
+        const invoiceData = XLSX.utils.sheet_to_json(invoiceSheet, { header: 1 });
         
         // Read items
         const itemsSheet = workbook.Sheets['Items'];
         const itemsData = XLSX.utils.sheet_to_json(itemsSheet, { header: 1 });
         
-        // Parse company data
+        // Parse invoice data
         const formData = {
           yourCompany: {
-            name: getValueFromData(companyData, 'Company Name'),
-            address: getValueFromData(companyData, 'Company Address'),
-            phone: getValueFromData(companyData, 'Company Phone'),
-            gst: getValueFromData(companyData, 'GST Number')
+            name: getValueFromData(invoiceData, 'Business Name'),
+            address: getValueFromData(invoiceData, 'Business Address'),
+            phone: getValueFromData(invoiceData, 'Business Phone')
           },
-          cashier: getValueFromData(companyData, 'Cashier'),
-          billTo: getValueFromData(companyData, 'Bill To'),
+          billTo: {
+            name: getValueFromData(invoiceData, 'Bill To Name'),
+            address: getValueFromData(invoiceData, 'Bill To Address'),
+            phone: getValueFromData(invoiceData, 'Bill To Phone')
+          },
+          shipTo: {
+            name: getValueFromData(invoiceData, 'Ship To Name'),
+            address: getValueFromData(invoiceData, 'Ship To Address'),
+            phone: getValueFromData(invoiceData, 'Ship To Phone')
+          },
           invoice: {
-            number: getValueFromData(companyData, 'Invoice Number'),
-            date: getValueFromData(companyData, 'Invoice Date')
+            number: getValueFromData(invoiceData, 'Invoice Number'),
+            date: getValueFromData(invoiceData, 'Invoice Date'),
+            paymentDate: getValueFromData(invoiceData, 'Due Date')
           },
-          selectedCurrency: getValueFromData(companyData, 'Currency') || 'MYR',
-          taxPercentage: parseFloat(getValueFromData(companyData, 'Tax Percentage')) || 0,
-          notes: getValueFromData(companyData, 'Notes'),
-          footer: getValueFromData(companyData, 'Footer')
+          selectedCurrency: getValueFromData(invoiceData, 'Currency') || 'MYR',
+          taxPercentage: parseFloat(getValueFromData(invoiceData, 'Tax Percentage')) || 0,
+          notes: getValueFromData(invoiceData, 'Notes')
         };
         
         // Parse items data
@@ -121,12 +133,12 @@ const getValueFromData = (data, fieldName) => {
   return row ? row[1] : '';
 };
 
-export const exportToPDF = async (receiptElement) => {
+export const exportToPDF = async (invoiceElement) => {
   try {
     const html2canvas = (await import('html2canvas')).default;
     const jsPDF = (await import('jspdf')).default;
     
-    const canvas = await html2canvas(receiptElement, {
+    const canvas = await html2canvas(invoiceElement, {
       scale: 2,
       useCORS: true,
       logging: false,
@@ -142,7 +154,7 @@ export const exportToPDF = async (receiptElement) => {
     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width * 0.264583, canvas.height * 0.264583);
 
     const timestamp = new Date().getTime();
-    const fileName = `Receipt_${timestamp}.pdf`;
+    const fileName = `Invoice_${timestamp}.pdf`;
 
     pdf.save(fileName);
   } catch (error) {
