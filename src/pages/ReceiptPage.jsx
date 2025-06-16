@@ -11,6 +11,7 @@ import { generateReceiptPDF } from "../utils/receiptPDFGenerator";
 import { generateGSTNumber } from "../utils/invoiceCalculations";
 import FloatingLabelInput from "../components/FloatingLabelInput";
 import ItemDetails from "../components/ItemDetails";
+import CurrencySelector from "../components/CurrencySelector";
 
 const generateRandomInvoiceNumber = () => {
   const length = Math.floor(Math.random() * 6) + 3;
@@ -77,7 +78,7 @@ const ReceiptPage = () => {
   const [theme, setTheme] = useState("Receipt1");
   const [notes, setNotes] = useState("");
   const [footer, setFooter] = useState("Thank you");
-  const [selectedCurrency, setSelectedCurrency] = useState("INR");
+  const [selectedCurrency, setSelectedCurrency] = useState("MYR");
 
   const refreshFooter = () => {
     const randomIndex = Math.floor(Math.random() * footerOptions.length);
@@ -317,6 +318,11 @@ const ReceiptPage = () => {
                 />
               </div>
             </div>
+
+            <CurrencySelector 
+              selectedCurrency={selectedCurrency}
+              onCurrencyChange={setSelectedCurrency}
+            />
 
             <ItemDetails
               items={items}
