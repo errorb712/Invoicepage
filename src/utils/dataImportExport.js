@@ -5,15 +5,18 @@ import { saveAs } from 'file-saver';
 export const exportToExcel = (formData) => {
   const workbook = XLSX.utils.book_new();
   
+  // Check if this is invoice data (has billTo as object) or receipt data (has billTo as string)
+  const isInvoiceData = formData.billTo && typeof formData.billTo === 'object';
+  
   // Create company info sheet
   const companyData = [
     ['Field', 'Value'],
     ['Business Name', formData.yourCompany?.name || ''],
     ['Business Address', formData.yourCompany?.address || ''],
     ['Business Phone', formData.yourCompany?.phone || ''],
-    ['Bill To Name', formData.billTo?.name || ''],
-    ['Bill To Address', formData.billTo?.address || ''],
-    ['Bill To Phone', formData.billTo?.phone || ''],
+    ['Bill To Name', isInvoiceData ? formData.billTo?.name || '' : formData.billTo || ''],
+    ['Bill To Address', isInvoiceData ? formData.billTo?.address || '' : ''],
+    ['Bill To Phone', isInvoiceData ? formData.billTo?.phone || '' : ''],
     ['Ship To Name', formData.shipTo?.name || ''],
     ['Ship To Address', formData.shipTo?.address || ''],
     ['Ship To Phone', formData.shipTo?.phone || ''],
@@ -22,7 +25,10 @@ export const exportToExcel = (formData) => {
     ['Due Date', formData.invoice?.paymentDate || ''],
     ['Currency', formData.selectedCurrency || 'MYR'],
     ['Tax Percentage', formData.taxPercentage || 0],
-    ['Notes', formData.notes || '']
+    ['Notes', formData.notes || ''],
+    ['GST Number', formData.yourCompany?.gst || ''],
+    ['Cashier', formData.cashier || ''],
+    ['Footer', formData.footer || '']
   ];
   
   const companySheet = XLSX.utils.aoa_to_sheet(companyData);
@@ -56,7 +62,7 @@ export const exportToExcel = (formData) => {
   XLSX.writeFile(workbook, fileName);
 };
 
-export const importFromExcel = (file) => {
+export const importFromExcel = (file, isReceiptPage = false) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
@@ -78,17 +84,8 @@ export const importFromExcel = (file) => {
           yourCompany: {
             name: getValueFromData(invoiceData, 'Business Name'),
             address: getValueFromData(invoiceData, 'Business Address'),
-            phone: getValueFromData(invoiceData, 'Business Phone')
-          },
-          billTo: {
-            name: getValueFromData(invoiceData, 'Bill To Name'),
-            address: getValueFromData(invoiceData, 'Bill To Address'),
-            phone: getValueFromData(invoiceData, 'Bill To Phone')
-          },
-          shipTo: {
-            name: getValueFromData(invoiceData, 'Ship To Name'),
-            address: getValueFromData(invoiceData, 'Ship To Address'),
-            phone: getValueFromData(invoiceData, 'Ship To Phone')
+            phone: getValueFromData(invoiceData, 'Business Phone'),
+            gst: getValueFromData(invoiceData, 'GST Number')
           },
           invoice: {
             number: getValueFromData(invoiceData, 'Invoice Number'),
@@ -97,8 +94,29 @@ export const importFromExcel = (file) => {
           },
           selectedCurrency: getValueFromData(invoiceData, 'Currency') || 'MYR',
           taxPercentage: parseFloat(getValueFromData(invoiceData, 'Tax Percentage')) || 0,
-          notes: getValueFromData(invoiceData, 'Notes')
+          notes: getValueFromData(invoiceData, 'Notes'),
+          cashier: getValueFromData(invoiceData, 'Cashier'),
+          footer: getValueFromData(invoiceData, 'Footer')
         };
+        
+        // Handle billTo differently based on whether this is for receipt page or invoice page
+        if (isReceiptPage) {
+          // For receipt page, billTo should be a string (just the name)
+          formData.billTo = getValueFromData(invoiceData, 'Bill To Name');
+        } else {
+          // For invoice page, billTo should be an object
+          formData.billTo = {
+            name: getValueFromData(invoiceData, 'Bill To Name'),
+            address: getValueFromData(invoiceData, 'Bill To Address'),
+            phone: getValueFromData(invoiceData, 'Bill To Phone')
+          };
+          // Add shipTo for invoice page
+          formData.shipTo = {
+            name: getValueFromData(invoiceData, 'Ship To Name'),
+            address: getValueFromData(invoiceData, 'Ship To Address'),
+            phone: getValueFromData(invoiceData, 'Ship To Phone')
+          };
+        }
         
         // Parse items data
         const items = [];
