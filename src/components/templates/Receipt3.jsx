@@ -77,17 +77,23 @@ const Receipt3 = ({ data, isPrint = false }) => {
               </tr>
             </thead>
             <tbody>
-              {items.map((item, index) => (
-                <tr 
-                  key={index} 
-                  className={`${index % 2 === 0 ? 'bg-yellow-50' : 'bg-white'} border-b border-gray-200`}
-                >
-                  <td className="py-2 font-medium">{`${index + 1}. ${item.name || "Your item name"}`}</td>
-                  <td className="text-center py-2 font-semibold">{item.quantity || 1}</td>
-                  <td className="text-center py-2 font-semibold">{formatCurrency(item.amount || 0, selectedCurrency)}</td>
-                  <td className="text-right py-2 font-bold">{formatCurrency((item.quantity || 0) * (item.amount || 0), selectedCurrency)}</td>
-                </tr>
-              ))}
+              {items.map((item, index) => {
+                const itemQuantity = Number(item.quantity) || 0;
+                const itemAmount = Number(item.amount) || 0;
+                const itemTotal = itemQuantity * itemAmount;
+                
+                return (
+                  <tr 
+                    key={index} 
+                    className={`${index % 2 === 0 ? 'bg-yellow-50' : 'bg-white'} border-b border-gray-200`}
+                  >
+                    <td className="py-2 font-medium">{`${index + 1}. ${item.name || "Your item name"}`}</td>
+                    <td className="text-center py-2 font-semibold">{itemQuantity}</td>
+                    <td className="text-center py-2 font-semibold">{formatCurrency(itemAmount, selectedCurrency)}</td>
+                    <td className="text-right py-2 font-bold">{formatCurrency(itemTotal, selectedCurrency)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

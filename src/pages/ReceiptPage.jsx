@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, RefreshCw, FileText, RotateCw } from "lucide-react";
@@ -359,6 +358,7 @@ const ReceiptPage = () => {
               handleItemChange={handleItemChange}
               addItem={addItem}
               removeItem={removeItem}
+              currencyCode={selectedCurrency}
             />
 
             <div className="mb-6">
