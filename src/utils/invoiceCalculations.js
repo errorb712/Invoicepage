@@ -8,11 +8,8 @@ export const calculateTaxAmount = (subTotal, taxPercentage) => {
   return (parseFloat(subTotal) * (taxPercentage / 100)).toFixed(2);
 };
 
-export const calculateGrandTotal = (subTotal, taxPercentage) => {
-  return (
-    parseFloat(subTotal).toFixed(2) +
-    calculateTaxAmount(subTotal, taxPercentage)
-  );
+export const calculateGrandTotal = (subTotal, taxAmount) => {
+  return (parseFloat(subTotal) + parseFloat(taxAmount)).toFixed(2);
 };
 
 export const generateGSTNumber = () => {
