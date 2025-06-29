@@ -1,4 +1,3 @@
-
 import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -9,9 +8,12 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: "8080",
+    port: 8080, // No quotes around the port number
   },
-     base: "/Invoicepage/",
+  base: "/Invoicepage/",  // Ensure your app is served correctly on GitHub Pages
+  build: {
+    outDir: 'dist', // Ensure the build files are in the 'dist' folder
+  },
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
